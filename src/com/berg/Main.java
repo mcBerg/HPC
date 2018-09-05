@@ -1,216 +1,87 @@
 package com.berg;
 
-import java.util.Random;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentSkipListSet;
 
-public class Main extends Thread {
-
-  static Random r = new Random();
-  static Integer size = null;
-  static Integer population = null;
-  static Scanner scanner = new Scanner(System.in);
-  static Long starttime;
+public class Main {
 
 
-  public static void main(String[] args) {
-    while (size == null) {
-      System.out.println("Sample Size:");
-      size = Integer.valueOf(scanner.nextLine());
-    }
+    static Integer size = null;
+    static Integer population = null;
+    static Scanner scanner = new Scanner(System.in);
+    static Long starttime;
 
-    while (population == null) {
-      System.out.println("Sample Population:");
-      population = Integer.valueOf(scanner.nextLine());
-    }
+    static Map<String, Long> resultComparison = new LinkedHashMap<>();
 
-    System.out.println("Will pick " + size + " from " + population);
-
-    //StraightWay
-    starttime = System.nanoTime();
-    System.out.println(straightWay(size, population));
-    System.out.println("Time in nanos: " + (System.nanoTime() - starttime));
-
-    //Recursive Split Way
-    starttime = System.nanoTime();
-    ConcurrentSkipListSet<Integer> results = new ConcurrentSkipListSet<Integer>() {
-      @Override
-      public boolean add(Integer integer) {
-        synchronized (size) {
-          if (this.size() < size) {
-            return super.add(integer);
-          }
-          return false;
+    public static void main(String[] args) {
+        while (size == null) {
+            System.out.println("Sample Size:");
+            size = Integer.valueOf(scanner.nextLine());
         }
-      }
-    };
-    Thread t = new Thread(new RecursiveSplitWay(size, 1, 1 + population, results, r, 1));
-    t.start();
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println("Recursive Split Way: Time in nanos: " + (System.nanoTime() - starttime));
 
-    //Set # of Threads
-    Integer THREADCOUNT = 2 ;
-    starttime = System.nanoTime();
-    results = new ConcurrentSkipListSet<Integer>();
-    setThreadCountStraightWay(size, population, results, r, THREADCOUNT);
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println(THREADCOUNT+" Threads: Time in nanos: " + (System.nanoTime() - starttime));
-
-    THREADCOUNT = 4 ;
-    starttime = System.nanoTime();
-    results = new ConcurrentSkipListSet<Integer>();
-    setThreadCountStraightWay(size, population, results, r, THREADCOUNT);
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println(THREADCOUNT+" Threads: Time in nanos: " + (System.nanoTime() - starttime));
-
-    THREADCOUNT = 6 ;
-    starttime = System.nanoTime();
-    results = new ConcurrentSkipListSet<Integer>();
-    setThreadCountStraightWay(size, population, results, r, THREADCOUNT);
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println(THREADCOUNT+" Threads: Time in nanos: " + (System.nanoTime() - starttime));
-
-    THREADCOUNT = 8 ;
-    starttime = System.nanoTime();
-    results = new ConcurrentSkipListSet<Integer>();
-    setThreadCountStraightWay(size, population, results, r, THREADCOUNT);
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println(THREADCOUNT+" Threads: Time in nanos: " + (System.nanoTime() - starttime));
-
-    THREADCOUNT = 10 ;
-    starttime = System.nanoTime();
-    results = new ConcurrentSkipListSet<Integer>();
-    setThreadCountStraightWay(size, population, results, r, THREADCOUNT);
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println(THREADCOUNT+" Threads: Time in nanos: " + (System.nanoTime() - starttime));
-
-    THREADCOUNT = 12 ;
-    starttime = System.nanoTime();
-    results = new ConcurrentSkipListSet<Integer>();
-    setThreadCountStraightWay(size, population, results, r, THREADCOUNT);
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println(THREADCOUNT+" Threads: Time in nanos: " + (System.nanoTime() - starttime));
-
-    THREADCOUNT = 14 ;
-    starttime = System.nanoTime();
-    results = new ConcurrentSkipListSet<Integer>();
-    setThreadCountStraightWay(size, population, results, r, THREADCOUNT);
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println(THREADCOUNT+" Threads: Time in nanos: " + (System.nanoTime() - starttime));
-
-    THREADCOUNT = 16 ;
-    starttime = System.nanoTime();
-    results = new ConcurrentSkipListSet<Integer>();
-    setThreadCountStraightWay(size, population, results, r, THREADCOUNT);
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println(THREADCOUNT+" Threads: Time in nanos: " + (System.nanoTime() - starttime));
-
-    THREADCOUNT = 32 ;
-    starttime = System.nanoTime();
-    results = new ConcurrentSkipListSet<Integer>();
-    setThreadCountStraightWay(size, population, results, r, THREADCOUNT);
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println(THREADCOUNT+" Threads: Time in nanos: " + (System.nanoTime() - starttime));
-
-    THREADCOUNT = size ;
-    starttime = System.nanoTime();
-    results = new ConcurrentSkipListSet<Integer>();
-    setThreadCountStraightWay(size, population, results, r, THREADCOUNT);
-    while (results.size() < size) {
-    }
-    System.out.println(results);
-    System.out.println(THREADCOUNT+" Threads: Time in nanos: " + (System.nanoTime() - starttime));
-  }
-
-  private static void setThreadCountStraightWay(Integer size, Integer population,
-      ConcurrentSkipListSet<Integer> results, Random r, int threads) {
-    for (int i = 0; i < threads; i++) {
-      Thread t = new Thread() {
-        @Override
-        public void run() {
-          while(results.size() < size) {
-            results.add(1+r.nextInt(population));
-          }
+        while (population == null) {
+            System.out.println("Sample Population:");
+            population = Integer.valueOf(scanner.nextLine());
         }
-      };
-      t.start();
-    }
-  }
 
-  private static TreeSet<Integer> straightWay(Integer size, Integer population) {
-    TreeSet<Integer> results = new TreeSet<Integer>();
-    while (results.size() < size) {
-      results.add(1 + r.nextInt(population));
+        System.out.println("Will pick " + size + " from " + population);
+
+        //Straight Way
+        starttime = System.nanoTime();
+        new StraightWay(size, population).start();
+        resultComparison.put("Straight Way ", System.nanoTime() - starttime);
+
+        //Split Way
+        starttime = System.nanoTime();
+        new SplitWay(size, population).start();
+        resultComparison.put("Split Way ", System.nanoTime() - starttime);
+
+        //2 Threaded Straight Way
+        starttime = System.nanoTime();
+        new ThreadedStraightWay(size, population, 2).callStart();
+        resultComparison.put("2 Threads Straight Way", System.nanoTime() - starttime);
+
+        //4 Threaded Straight Way
+        starttime = System.nanoTime();
+        new ThreadedStraightWay(size, population, 4).callStart();
+        resultComparison.put("4 Threads Straight Way", System.nanoTime() - starttime);
+
+        //7 Threaded Straight Way
+        starttime = System.nanoTime();
+        new ThreadedStraightWay(size, population, 7).callStart();
+        resultComparison.put("7 Threads Straight Way", System.nanoTime() - starttime);
+
+        //8 Threaded Straight Way
+        starttime = System.nanoTime();
+        new ThreadedStraightWay(size, population, 8).callStart();
+        resultComparison.put("8 Threads Straight Way", System.nanoTime() - starttime);
+
+        //9 Threaded Straight Way
+        starttime = System.nanoTime();
+        new ThreadedStraightWay(size, population, 9).callStart();
+        resultComparison.put("9 Threads Straight Way", System.nanoTime() - starttime);
+
+        //16 Threaded Straight Way
+        starttime = System.nanoTime();
+        new ThreadedStraightWay(size, population, 16).callStart();
+        resultComparison.put("16 Threads Straight Way", System.nanoTime() - starttime);
+
+        Integer cores = Runtime.getRuntime().availableProcessors();
+        //cores Threaded Straight Way
+        starttime = System.nanoTime();
+        new ThreadedStraightWay(size, population, cores).callStart();
+        resultComparison.put("Cores(" + cores + ") Threads Straight Way", System.nanoTime() - starttime);
+
+        //Size Threaded Straight Way
+        starttime = System.nanoTime();
+        new ThreadedStraightWay(size, population, size).callStart();
+        resultComparison.put(size + " Threads Straight Way", System.nanoTime() - starttime);
+
+        for (String key : resultComparison.keySet()) {
+            System.out.format("%-30s", key);
+            System.out.format("%15d", resultComparison.get(key));
+            System.out.println();
+        }
     }
-    return results;
-  }
 }
-
-class RecursiveSplitWay implements Runnable {
-
-  Integer size;
-  Integer zero;
-  Integer population;
-  ConcurrentSkipListSet<Integer> results;
-  Random r;
-  Integer id;
-
-  public RecursiveSplitWay(Integer size, Integer zero, Integer population,
-      ConcurrentSkipListSet<Integer> results, Random r, Integer id) {
-    this.size = size;
-    this.zero = zero;
-    this.population = population;
-    this.results = results;
-    this.r = r;
-    this.id = id;
-  }
-
-  @Override
-  public void run() {
-    Integer random = zero + r.nextInt(population - zero);
-    if (results.add(random)) {
-      if (size - results.size() > 0) {
-        recursiveSplitWay(size, zero, random, population, results, r, id);
-      }
-    }
-  }
-
-  private void recursiveSplitWay(Integer size, Integer zero, Integer random, Integer population,
-      ConcurrentSkipListSet<Integer> results, Random r, Integer id) {
-    if (random - zero > 0) {
-      Thread t1 = new Thread(new RecursiveSplitWay(size, zero, random, results, r, 1 + id));
-      t1.start();
-    }
-    if (population - (random + 1) > 0) {
-      Thread t2 = new Thread(
-          new RecursiveSplitWay(size, random + 1, population, results, r, 2 + id));
-      t2.start();
-    }
-  }
-}
-
-
-
-
